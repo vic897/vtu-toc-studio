@@ -11,55 +11,45 @@ import ExplanationPanel from '@/components/explanation/ExplainationPanel';
 
 export default function Workspace() {
   const { loadMachine } = useAutomataStore();
-  const [selectedKey, setSelectedKey] = useState<keyof typeof pyqBank>(
-    Object.keys(pyqBank)[0] as keyof typeof pyqBank,
-  );
+  const [selectedKey, setSelectedKey] = useState(Object.keys(pyqBank)[0]);
 
-  const selectedMachine = pyqBank[selectedKey] as Parameters<typeof loadMachine>[0];
-
-  // Load initial machine on mount
+  // Single source of truth: whenever the selection changes, load that machine.
   useEffect(() => {
-    loadMachine(selectedMachine);
-  }, [selectedMachine, loadMachine]);
-
-  const handleMachineChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const key = e.target.value as keyof typeof pyqBank;
-    const machine = pyqBank[key] as Parameters<typeof loadMachine>[0];
-
-    setSelectedKey(key);
-    loadMachine(machine);
-  };
+    loadMachine(pyqBank[selectedKey]);
+  }, [selectedKey, loadMachine]);
 
   return (
-    <main className="min-h-screen bg-slate-950 text-slate-300 p-4 md:p-6 font-sans">
-      {/* Header Bar */}
-      <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 pb-4 border-b border-slate-800">
-        <div>
-          <h1 className="text-2xl font-bold text-white flex items-center gap-3">
-            VTU TOC Studio
-            <span className="text-xs bg-teal-600/20 text-teal-400 px-2 py-1 rounded-full border border-teal-600/30 uppercase tracking-wider">
-              Phase 1
-            </span>
-          </h1>
-          <p className="text-sm text-slate-500 mt-1">Interactive Automata Visualizer & Study Guide</p>
+    <main className="max-w-[1600px] mx-auto text-slate-300 p-4 md:p-6 font-sans">
+      {/* Workspace Toolbar */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 bg-slate-900/40 p-3 rounded-xl border border-slate-800/60">
+        <div className="px-2">
+          <h2 className="text-sm font-semibold text-slate-300 uppercase tracking-wider">Active Problem</h2>
         </div>
-        
-        <div className="w-full md:w-auto">
-          <select 
+
+        <div className="w-full md:w-auto flex items-center gap-3">
+          <select
             value={selectedKey}
-            onChange={handleMachineChange}
-            className="w-full md:w-80 bg-slate-900 border border-slate-700 text-white rounded-lg px-4 py-2.5 outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all"
+            onChange={(e) => setSelectedKey(e.target.value)}
+            className="w-full md:w-96 bg-slate-950 border border-slate-700 text-slate-200 rounded-lg px-4 py-2 outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500/50 shadow-inner transition-all text-sm font-medium"
           >
             {Object.keys(pyqBank).map(key => (
               <option key={key} value={key}>{key}</option>
             ))}
           </select>
+          {/* Phase 2: opens the Custom JSON modal builder */}
+          <button
+            disabled
+            title="Custom JSON builder arrives in Phase 2"
+            className="bg-teal-600 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-lg shadow-teal-900/20 whitespace-nowrap disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            + Custom JSON
+          </button>
         </div>
-      </header>
+      </div>
 
       {/* Split Pane Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        
+
         {/* Left Window: Explanation Panel */}
         <div className="lg:col-span-4 flex flex-col h-full">
           <ExplanationPanel />
@@ -67,7 +57,7 @@ export default function Workspace() {
 
         {/* Right Window: Visualizer Workspace */}
         <div className="lg:col-span-8 flex flex-col gap-6">
-          
+
           {/* Top Block: Canvas and Tape */}
           <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col gap-4">
             <div className="flex justify-between items-center px-2">

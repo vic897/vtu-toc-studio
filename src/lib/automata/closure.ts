@@ -1,7 +1,10 @@
 import { AutomatonSpec, Transition } from '@/types/automata';
 
-export const isEpsilon = (symbol: string): boolean =>
-  symbol === '' || symbol === 'ε' || symbol.toLowerCase() === 'eps';
+// Bare 'e'/'E' is deliberately not an alias: it would collide with alphabets like {a..e}.
+export const isEpsilon = (symbol: string): boolean => {
+  const normalized = symbol.trim().toLowerCase();
+  return symbol === '' || symbol === 'ε' || normalized === 'eps' || normalized === 'epsilon';
+};
 
 export function epsilonClosure(machine: AutomatonSpec, initialStates: string[]): string[] {
   const closureSet = new Set<string>(initialStates);

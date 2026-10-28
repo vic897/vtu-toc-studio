@@ -2,6 +2,7 @@
 import { useEffect, useRef } from 'react';
 import cytoscape from 'cytoscape';
 import { useAutomataStore } from '@/store/useAutomataStore';
+import { isEpsilon } from '@/lib/automata/closure';
 
 export default function AutomataCanvas() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -31,7 +32,7 @@ export default function AutomataCanvas() {
     const edgeMap: Record<string, string[]> = {};
     transitions.forEach(t => {
       const key = `${t.from}|${t.to}`;
-      const sym = t.symbol === '' ? 'ε' : t.symbol;
+      const sym = isEpsilon(t.symbol) ? 'ε' : t.symbol;
       if (!edgeMap[key]) edgeMap[key] = [];
       edgeMap[key].push(sym);
     });

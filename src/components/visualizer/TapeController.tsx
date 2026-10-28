@@ -4,9 +4,10 @@ import { useAutomataStore } from '@/store/useAutomataStore';
 import { Play, Pause, SkipBack, SkipForward, RotateCcw } from 'lucide-react';
 
 export default function TapeController() {
-  const { 
-    inputString, setInput, executionSteps, currentStepIndex, isPlaying, setPlaying, stepForward, stepBackward, reset 
+  const {
+    activeMachine, inputString, setInput, executionSteps, currentStepIndex, isPlaying, setPlaying, stepForward, stepBackward, reset
   } = useAutomataStore();
+  const tests = activeMachine?.tests;
 
   const currentStep = executionSteps[currentStepIndex];
   const isComplete = executionSteps.length > 0 && currentStepIndex === executionSteps.length - 1;
@@ -34,16 +35,35 @@ export default function TapeController() {
   };
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 mt-4 space-y-4">
+    <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 space-y-4">
       <div className="flex gap-2">
-        <input 
-          type="text" 
-          value={inputString} 
-          onChange={handleInput} 
+        <input
+          type="text"
+          value={inputString}
+          onChange={handleInput}
           placeholder="Enter test string..."
           className="flex-1 bg-slate-800 text-slate-100 px-4 py-2 rounded-lg outline-none focus:ring-2 focus:ring-teal-500"
         />
       </div>
+
+      {/* Quick-load the PYQ's known accept/reject strings */}
+      {tests && (
+        <div className="flex flex-wrap items-center gap-2 text-xs font-mono">
+          <span className="font-sans font-semibold text-slate-500 uppercase tracking-wider mr-1">Try</span>
+          {tests.accept.map(s => (
+            <button key={`a:${s}`} onClick={() => setInput(s)} title="Expected: accept"
+              className="px-2 py-1 rounded-md border border-green-500/30 bg-green-500/5 text-green-400 hover:bg-green-500/15 transition-colors">
+              {s || 'ε'}
+            </button>
+          ))}
+          {tests.reject.map(s => (
+            <button key={`r:${s}`} onClick={() => setInput(s)} title="Expected: reject"
+              className="px-2 py-1 rounded-md border border-red-500/30 bg-red-500/5 text-red-400 hover:bg-red-500/15 transition-colors">
+              {s || 'ε'}
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* Tape Visualization */}
       <div className="font-mono text-2xl tracking-[0.2em] bg-slate-950 py-3 px-4 rounded-lg overflow-x-auto whitespace-nowrap">

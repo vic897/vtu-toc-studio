@@ -1,10 +1,15 @@
-export type AutomatonType = 'DFA' | 'NFA';
+export type AutomatonType = 'DFA' | 'NFA' | 'eNFA';
 export type ExecutionStatus = 'running' | 'accepted' | 'rejected' | 'error';
 
 export interface Transition {
   from: string;
   symbol: string;
   to: string;
+}
+
+export interface AutomatonTests {
+  accept: string[];
+  reject: string[];
 }
 
 export interface ActiveTransition {
@@ -14,6 +19,7 @@ export interface ActiveTransition {
 }
 
 export interface AutomatonSpec {
+  id?: string;
   type: AutomatonType;
   states: string[];
   alphabet: string[];
@@ -22,6 +28,7 @@ export interface AutomatonSpec {
   transitions: Transition[];
   description?: string;
   explanation?: string[];
+  tests?: AutomatonTests;
 }
 
 export interface ExecutionStep {
