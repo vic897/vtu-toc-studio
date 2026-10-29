@@ -8,6 +8,13 @@ import TapeController from '@/components/visualizer/TapeController';
 import TransitionTable from '@/components/visualizer/TransitionTable';
 import TupleDisplay from '@/components/visualizer/TupleDisplay';
 import ExplanationPanel from '@/components/explanation/ExplainationPanel';
+import { AutomatonType } from '@/types/automata';
+
+const PROBLEM_GROUPS: { type: AutomatonType; label: string }[] = [
+  { type: 'DFA', label: 'DFA' },
+  { type: 'NFA', label: 'NFA' },
+  { type: 'eNFA', label: 'ε-NFA' },
+];
 
 export default function Workspace() {
   const { loadMachine } = useAutomataStore();
@@ -32,8 +39,14 @@ export default function Workspace() {
             onChange={(e) => setSelectedKey(e.target.value)}
             className="w-full md:w-96 bg-slate-950 border border-slate-700 text-slate-200 rounded-lg px-4 py-2 outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500/50 shadow-inner transition-all text-sm font-medium"
           >
-            {Object.keys(pyqBank).map(key => (
-              <option key={key} value={key}>{key}</option>
+            {PROBLEM_GROUPS.map(({ type, label }) => (
+              <optgroup key={type} label={label}>
+                {Object.entries(pyqBank)
+                  .filter(([, m]) => m.type === type)
+                  .map(([key]) => (
+                    <option key={key} value={key}>{key}</option>
+                  ))}
+              </optgroup>
             ))}
           </select>
         </div>
