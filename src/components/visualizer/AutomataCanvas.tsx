@@ -8,6 +8,9 @@ import { computeLayout, X_GAP, Y_GAP } from '@/lib/automata/layout';
 // Small machines would otherwise be blown up to fill the whole canvas.
 const MAX_FIT_ZOOM = 1.3;
 
+// Nodes widen into ovals for long names such as subset-construction states "{q0,q1,q2}".
+const nodeWidth = (label: string) => Math.max(45, label.length * 8 + 18);
+
 function fitGraph(cy: cytoscape.Core) {
   cy.resize();
   cy.fit(undefined, 40);
@@ -29,16 +32,19 @@ export default function AutomataCanvas() {
 
     const elements: cytoscape.ElementDefinition[] = [];
     const { states, start, accept, transitions } = activeMachine;
-    const { positions } = computeLayout(activeMachine);
+    // Widen the columns so the widest node still leaves room for an edge and its label.
+    const widest = Math.max(...states.map(nodeWidth));
+    const xGap = Math.max(X_GAP, widest + 70);
+    const { positions } = computeLayout(activeMachine, xGap);
 
     // Hidden start node to the left of the start state, for the initial arrow
     const startPos = positions[start] ?? { x: 0, y: 0 };
-    elements.push({ data: { id: '__start', label: '' }, classes: 'startdot', position: { x: startPos.x - 70, y: startPos.y } });
+    elements.push({ data: { id: '__start', label: '', w: 1 }, classes: 'startdot', position: { x: startPos.x - nodeWidth(start) / 2 - 48, y: startPos.y } });
     elements.push({ data: { id: 'e_start', source: '__start', target: start, label: '' }, classes: 'startedge' });
 
     states.forEach(state => {
       elements.push({
-        data: { id: state, label: state },
+        data: { id: state, label: state, w: nodeWidth(state) },
         classes: accept.includes(state) ? 'accept' : '',
         position: positions[state],
       });
@@ -57,7 +63,7 @@ export default function AutomataCanvas() {
       const [source, target] = key.split('|');
       const a = positions[source];
       const b = positions[target];
-      const cols = a && b ? Math.round(Math.abs(b.x - a.x) / X_GAP) : 0;
+      const cols = a && b ? Math.round(Math.abs(b.x - a.x) / xGap) : 0;
       const rows = a && b ? Math.round(Math.abs(b.y - a.y) / Y_GAP) : 0;
       // A straight line that jumps over a column (or over a state in the same
       // column) would run through the states in between, so arc it instead.
@@ -79,7 +85,7 @@ export default function AutomataCanvas() {
       minZoom: 0.3,
       maxZoom: 2.5,
       style: [
-        { selector: 'node', style: { label: 'data(label)', 'text-valign': 'center', 'background-color': '#1e293b', color: '#f8fafc', 'border-width': 2, 'border-color': '#64748b', width: 45, height: 45, 'font-size': 14 } },
+        { selector: 'node', style: { label: 'data(label)', 'text-valign': 'center', 'background-color': '#1e293b', color: '#f8fafc', 'border-width': 2, 'border-color': '#64748b', width: 'data(w)', height: 45, 'font-size': 14 } },
         { selector: 'node.accept', style: { 'border-width': 5, 'border-style': 'double' } },
         { selector: 'node.startdot', style: { width: 1, height: 1, 'background-opacity': 0, 'border-width': 0, events: 'no' } },
         { selector: 'edge', style: { width: 2, 'line-color': '#64748b', 'target-arrow-color': '#64748b', 'target-arrow-shape': 'triangle', 'curve-style': 'bezier', 'control-point-step-size': 50, label: 'data(label)', color: '#f8fafc', 'text-background-color': '#0f172a', 'text-background-opacity': 1, 'text-background-padding': '2px', 'font-size': 13 } },

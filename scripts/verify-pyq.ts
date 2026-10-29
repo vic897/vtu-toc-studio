@@ -6,6 +6,7 @@ import { pyqBank } from '@/data/pyq-bank';
 import { simulate } from '@/lib/automata/simulator';
 import { isEpsilon } from '@/lib/automata/closure';
 import { AutomatonSpec } from '@/types/automata';
+import { subsetConstruction } from '@/lib/automata/subset';
 import { pyqReference } from './pyq-reference';
 
 const MAX_LEN = 8;
@@ -27,7 +28,7 @@ const fail = (name: string, msg: string) => {
   console.error(`  ✗ ${name}: ${msg}`);
 };
 
-for (const [name, m] of Object.entries(pyqBank)) {
+function verifyMachine(name: string, m: AutomatonSpec) {
   const states = new Set(m.states);
   const before = failures;
 
@@ -61,7 +62,7 @@ for (const [name, m] of Object.entries(pyqBank)) {
 
   // Exhaustive check against the reference language; report only the
   // shortest counterexample, which is the easiest one to trace by hand.
-  const reference = pyqReference[name];
+  const reference = pyqReference[m.derivedFrom ?? name];
   let checked = 0;
   if (!reference) {
     fail(name, 'has no reference definition in scripts/pyq-reference.ts');
@@ -79,6 +80,12 @@ for (const [name, m] of Object.entries(pyqBank)) {
     const count = (m.tests?.accept.length ?? 0) + (m.tests?.reject.length ?? 0);
     console.log(`  ✓ ${name} (${count} test strings, ${checked} exhaustive)`);
   }
+}
+
+for (const [name, m] of Object.entries(pyqBank)) {
+  verifyMachine(name, m);
+  // The subset-construction DFA must be complete and accept exactly the same language.
+  if (m.type !== 'DFA') verifyMachine(`${name}  →  subset DFA`, subsetConstruction(m, name));
 }
 
 for (const name of Object.keys(pyqReference)) {

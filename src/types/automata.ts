@@ -29,6 +29,7 @@ export interface AutomatonSpec {
   description?: string;
   explanation?: string[];
   tests?: AutomatonTests;
+  derivedFrom?: string;      // Set on machines generated from another one (e.g. subset construction)
 }
 
 export interface ExecutionStep {

@@ -25,10 +25,14 @@ export const useAutomataStore = create<AutomataState>((set, get) => ({
   isPlaying: false,
 
   loadMachine: (machine: AutomatonSpec) => {
-    const { inputString } = get();
+    // Keep the tape when switching problems (e.g. NFA ↔ its subset DFA), unless
+    // it uses symbols the new machine's alphabet doesn't have.
+    const { inputString: current } = get();
+    const inputString = [...current].every(c => machine.alphabet.includes(c)) ? current : '';
     const steps = simulate(machine, inputString);
-    set({ 
-      activeMachine: machine, 
+    set({
+      activeMachine: machine,
+      inputString,
       executionSteps: steps, 
       currentStepIndex: 0,
       isPlaying: false

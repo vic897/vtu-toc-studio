@@ -17,7 +17,7 @@ export const Y_GAP = 100;
 // BFS distance from the start state, and states sharing a column are stacked
 // vertically around the centre line in discovery order. Unreachable states get
 // a final column of their own so they stay visible.
-export function computeLayout(machine: AutomatonSpec): MachineLayout {
+export function computeLayout(machine: AutomatonSpec, xGap = X_GAP): MachineLayout {
   const levels: Record<string, number> = { [machine.start]: 0 };
   const columns: string[][] = [[machine.start]];
   const queue = [machine.start];
@@ -43,7 +43,7 @@ export function computeLayout(machine: AutomatonSpec): MachineLayout {
   const positions: Record<string, Point> = {};
   columns.forEach((column, level) => {
     column.forEach((state, i) => {
-      positions[state] = { x: level * X_GAP, y: (i - (column.length - 1) / 2) * Y_GAP };
+      positions[state] = { x: level * xGap, y: (i - (column.length - 1) / 2) * Y_GAP };
     });
   });
 

@@ -30,9 +30,15 @@ export default function ExplanationPanel() {
             </p>
           </div>
         </div>
-        <div className="px-3 py-1 bg-teal-500/10 border border-teal-500/20 text-teal-400 text-xs font-semibold uppercase tracking-wider rounded-full whitespace-nowrap">
-          VTU PYQ
-        </div>
+        {activeMachine.derivedFrom ? (
+          <div className="px-3 py-1 bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-semibold uppercase tracking-wider rounded-full whitespace-nowrap">
+            Subset Construction
+          </div>
+        ) : (
+          <div className="px-3 py-1 bg-teal-500/10 border border-teal-500/20 text-teal-400 text-xs font-semibold uppercase tracking-wider rounded-full whitespace-nowrap">
+            VTU PYQ
+          </div>
+        )}
       </div>
 
       <div className="flex-1 overflow-y-auto pr-2">
