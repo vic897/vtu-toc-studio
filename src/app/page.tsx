@@ -26,7 +26,7 @@ export default function Workspace() {
           <h2 className="text-sm font-semibold text-slate-300 uppercase tracking-wider">Active Problem</h2>
         </div>
 
-        <div className="w-full md:w-auto flex items-center gap-3">
+        <div className="w-full md:w-auto">
           <select
             value={selectedKey}
             onChange={(e) => setSelectedKey(e.target.value)}
@@ -36,14 +36,6 @@ export default function Workspace() {
               <option key={key} value={key}>{key}</option>
             ))}
           </select>
-          {/* Phase 2: opens the Custom JSON modal builder */}
-          <button
-            disabled
-            title="Custom JSON builder arrives in Phase 2"
-            className="bg-teal-600 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-lg shadow-teal-900/20 whitespace-nowrap disabled:opacity-40 disabled:cursor-not-allowed"
-          >
-            + Custom JSON
-          </button>
         </div>
       </div>
 
